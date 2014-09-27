@@ -9,7 +9,7 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/normalize.min.css">
         <link rel="stylesheet" href="css/main.css">
 
@@ -19,8 +19,42 @@
         <![endif]-->
     </head>
     <body>
+        <header class="header">
+            <h1>Khanversations</h1>
+            <h2>A challenge framework, for providing real-time, conversational feedback to javascript developers in the browser.</h2>
+        </header>
+        <main class="content">
+            <section class="code-content">
+                <h3>Add testable javascript code below</h3>
+                <div class="examples">
+                    <a href="#" class="example1">Populate Example 1</a>
+                </div>
+                <div class="hidden-examples">
+                    <ol>
+                        <li class="hidden-example1">function elementSupportsAttribute(element, attribute) {
+    var test = document.createElement(element);
+    if (attribute in test) {
+        return true;
+    } else {
+        return false;
+    }
+};
+                        </li>
+                        <li class="hidden-example2">
 
-        <p>Khanversations: A challenge framework, for providing real-time, conversational feedback to javascript developers in the browser..</p>
+                        </li>
+                    </ol>
+                    <a href="#" class="example1">Populate Example 1</a>
+                </div>
+                <form>
+                    <textarea class="codebox"></textarea>
+                </form>
+            </section>
+            <section class="message-content">
+                <h3>Messages</h3>
+                <div class="messages"></div>
+            </section>
+        </main>
 
         <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script> -->
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.js"><\/script>')</script>

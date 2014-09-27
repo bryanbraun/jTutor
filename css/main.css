@@ -61,12 +61,74 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
 
+body {
+    font-family: 'PT Sans', sans-serif;
+}
 
+.header {
+    width: 100%;
+    background: #41a051;
+    background: -moz-linear-gradient(top, #41a051 0%, #2b6b2f 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#41a051), color-stop(100%,#2b6b2f));
+    background: -webkit-linear-gradient(top, #41a051 0%,#2b6b2f 100%);
+    background: -o-linear-gradient(top, #41a051 0%,#2b6b2f 100%);
+    background: -ms-linear-gradient(top, #41a051 0%,#2b6b2f 100%);
+    background: linear-gradient(to bottom, #41a051 0%,#2b6b2f 100%);
+    color: #fff;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    padding: 10px 8% 20px;
+    text-align: center;
+}
+.header h1 {
+    font-size: 40px;
+}
+.header h2 {
+    font-size: 24px;
+}
+.content {
+    width: 100%;
+    padding: 0 8%;
+}
 
+.code-content {
+    width: 49%;
+    float: left;
+    border-right: 1px solid #ccc;
+    padding-right: 2em;
+    min-height: 600px;
+}
+.codebox {
+    font-family: "Inconsolata", "Menlo", "Consolas", monospace;
+    width: 100%;
+    border: 1px solid #ccc;
+    min-height: 300px;
+    padding: 4px;
+}
 
+.message-content {
+    width: 50%;
+    float: left;
+    padding-left: 2em;
+}
 
+.messages {
+    width: 100%;
+    min-height: 300px;
+    border: 1px solid #f0f0f0;
+    background: #f0f0f0;
+}
 
+.hidden-examples {
+    display: none;
+}
 
 
 
