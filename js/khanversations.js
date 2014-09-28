@@ -18,7 +18,7 @@ var kv = (function () {
      *        current.
      */
     var listmap = {
-        "ConditionalExpression": "Conditional Expression", // Ternary
+        "ConditionalExpression": "Conditional Expression",
         "IfStatement": "If Statement",
         "ForStatement": "For Statement",
         "VariableDeclaration": "Variable Declaration",
@@ -130,6 +130,7 @@ var kv = (function () {
                 });
 
                 if (!item1Found || !item2Found) {
+                    this.scores = scores;
                     return [1];
                 }
 
@@ -161,6 +162,7 @@ var kv = (function () {
             return this;
         },
         this.areAnyXContainingY = function(x, y) {
+
             this.compareStructure(x, y);
             var allScores = this.scores;
             for (var i = 0; i < allScores.length; i++) {

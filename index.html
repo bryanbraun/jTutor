@@ -21,11 +21,14 @@
     <body>
         <header class="header">
             <h1>Khanversations</h1>
-            <h2>A challenge framework, for providing real-time, conversational feedback to javascript developers in the browser.</h2>
+            <h2>An API for providing real-time, conversational feedback to javascript developers in the browser.</h2>
         </header>
         <main class="content">
             <section class="code-content">
                 <h3>Add testable javascript code below</h3>
+                <form>
+                    <textarea class="codebox"></textarea>
+                </form>
                 <div class="examples">
                     <a href="#" class="example1">Populate Example 1</a>
                 </div>
@@ -33,7 +36,12 @@
                     <ol>
                         <li class="hidden-example1">function elementSupportsAttribute(element, attribute) {
     if (attribute in test) {
-        return test.created ? true : false;
+        try {
+            myfunc();
+        } catch (e) {
+            report(e);
+        }
+        return true;
     } else {
         return false;
     }
@@ -48,16 +56,14 @@
                     </ol>
                     <a href="#" class="example1">Populate Example 1</a>
                 </div>
-                <form>
-                    <textarea class="codebox"></textarea>
-                </form>
                 <div class="api-setting">
                     <h3>Current API Setting:</h3>
                     <pre>var code = $('.codebox').val();
-var tree = kv.check(code).mustContain(['VariableDeclaration', 'ForStatement'])
+var tree = kv.check(code)
+    .mustContain(['VariableDeclaration', 'ForStatement'])
     .mustNotContain(['IfStatement'])
     .anXMustContainY('ForStatement', 'VariableDeclaration')
-    .noXShouldContainY('IfStatement', 'ConditionalExpression');
+    .noXShouldContainY('IfStatement', 'TryStatement');
 printMessages(tree.messages);</pre>
                 </div>
             </section>

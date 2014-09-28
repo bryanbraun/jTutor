@@ -14,7 +14,7 @@ function inspectCode() {
     var tree = kv.check(code).mustContain(['VariableDeclaration', 'ForStatement'])
                              .mustNotContain(['IfStatement'])
                              .anXMustContainY('ForStatement', 'VariableDeclaration')
-                             .noXShouldContainY('IfStatement', 'ConditionalExpression');
+                             .noXShouldContainY('IfStatement', 'TryStatement');
     printMessages(tree.messages);
 }
 

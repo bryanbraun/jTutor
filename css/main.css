@@ -99,6 +99,14 @@ body {
     padding: 0 8%;
 }
 
+.content a {
+    color: green;
+}
+.content a:link { color: green; }
+.content a:visited { color: green; }
+.content a:hover { color: green; }
+.content a:active { color: green; }
+
 .code-content {
     width: 49%;
     float: left;
