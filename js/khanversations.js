@@ -1,30 +1,41 @@
-// Our testing API
 var kv = (function () {
+    /**
+     * Config data.
+     *
+     * @todo: Integrate Esprima's more descriptive error messages.
+     */
+    config = {
+        errorMsg: "There is an error in your code.",
+        youNeedMsg: "Oops, you need to use a ",
+        youDontNeedMsg: "Oops, you don't need to use a "
+    };
 
-    // A version of traverse that can (hypothetically) accept multiple functions
-    // to be run on each node (basically, a premature optimization).
-    function multiTraverse(object) {
-        var key,
-            child,
-            argsCopy = [].slice.call(arguments);
-
-        argsCopy.shift();
-
-        for (var i = 1; i < argsCopy.length; i++) {
-            if (argsCopy[i].call(null, object) === false) {
-                return;
-            }
-        }
-
-        for (key in object) {
-            if (object.hasOwnProperty(key)) {
-                child = object[key];
-                if (typeof child === 'object' && child !== null) {
-                    multiTraverse.apply(this, argsCopy);
-                }
-            }
-        }
-    }
+    /**
+     * A list of common testable functionality, with human readable text (see
+     * Esprima API for all possible options).
+     *
+     * @todo: Pull the list directly from Esprima, which ensures it's always
+     *        current.
+     */
+    var listmap = {
+        "ConditionalExpression": "Conditional Expression", // Ternary
+        "IfStatement": "If Statement",
+        "ForStatement": "For Statement",
+        "VariableDeclaration": "Variable Declaration",
+        "WhileStatement": "While Statement",
+        "ContinueStatement": "Continue Statement",
+        "SwitchStatement": "Switch Statement",
+        "SwitchCase": "Switch Case",
+        "BreakStatement": "Break Statement",
+        "DoWhileStatement": "Do-While Statement",
+        "UpdateExpression": "Update Expression", // Increment or decrement
+        "TryStatement": "Try Statment",
+        "CatchClause": "Catch Clause",
+        "ThrowStatement": "Throw Statement",
+        "NewExpression": "New Expression", // For instantiating objects
+        "FunctionDeclaration": "Function Declaration",
+        "ReturnStatement": "Return Statement"
+    };
 
     // Step recursively through the syntax tree object, applying our function.
     // Borrowed from this esprima.js example:
@@ -43,49 +54,44 @@ var kv = (function () {
         }
     }
 
-    /**
-     * A list of supported testable functionality, with human readable text.
-     */
-    var listmap = {
-        "ConditionalExpression": "Conditional Expression", // ternary
-        "IfStatement": "If Statement",
-        "ForStatement": "For Statement",
-        "VariableDeclaration": "Variable Declaration",
-        "WhileStatement": "While Statement"
-    };
-
-    var testArray = ['ConditionalExpression', 'IfStatement', 'ForStatement'];
-
     function Tree() {
         this.jsTree  = {},
         this.messages = [],
+        this.scores = [],
+        this.error = false,
         this.blacklist = function(listitems) {
             var self = this;
-            traverse(this.jsTree, function(node) {
-                for (var i = 0; i < listitems.length; i++) {
-                    if (node.type === listitems[i]) {
-                        self.messages.push("Oops, you don't need to use a " + listmap[listitems[i]]);
+
+            if (this.error !== true) {
+                traverse(this.jsTree, function(node) {
+                    for (var i = 0; i < listitems.length; i++) {
+                        if (node.type === listitems[i]) {
+                            self.messages.push(config.youDontNeedMsg + listmap[listitems[i]]);
+                        }
                     }
-                }
-            });
+                });
+            }
             return this;
         },
         this.whitelist = function(listitems) {
             var nodeCounts = {},
                 self = this;
+
             for (var i = 0; i < listitems.length; i++) {
                 nodeCounts[listitems[i]] = 0;
             }
-            traverse(this.jsTree, function(node) {
-                for (i = 0; i < listitems.length; i++) {
-                    if (node.type === listitems[i]) {
-                        nodeCounts[listitems[i]]++;
+            if (this.error !== true) {
+                traverse(this.jsTree, function(node) {
+                    for (i = 0; i < listitems.length; i++) {
+                        if (node.type === listitems[i]) {
+                            nodeCounts[listitems[i]]++;
+                        }
                     }
-                }
-            });
-            for (i = 0; i < listitems.length; i++) {
-                if (nodeCounts[listitems[i]] === 0) {
-                    self.messages.push("Oops, you need to use a " + listmap[listitems[i]]);
+                });
+                for (i = 0; i < listitems.length; i++) {
+                    if (nodeCounts[listitems[i]] === 0) {
+                        self.messages.push(config.youNeedMsg + listmap[listitems[i]]);
+                    }
                 }
             }
             return this;
@@ -97,78 +103,121 @@ var kv = (function () {
             // Bitmask Scoring Rubric
             //
             // 000001  1   Either item 1 or item 2 is missing.
-            // 000010  2   Item 2 precedes Item 1.
-            // 000100  4   Item 1 precedes Item 2.
-            // 001000  8   Item 2 contains Item 1.
-            // 010000  16  Item 1 contains Item 2.
+            // 000010  2   Item 1 does not contain Item 2.
+            // 000100  4   Item 2 does not contain Item 1.
+            // 000010  8   Item 1 contains Item 2.
+            // 000100  16  Item 2 contains Item 1.
 
-            var score = 0,
-                subtree1 = null,
-                subtree2 = null,
-                foundFirst = '';
+            var scores = [],
+                subtrees = [],
+                item1Found,
+                item2Found,
+                currentItem;
 
-            traverse(this.jsTree, function(node) {
-                if (node.type === item1) {
-                    if (!foundFirst) {
-                        foundFirst = node.type;
-                        score += 4;
+            if (this.error !== true) {
+                traverse(this.jsTree, function(node) {
+                    if (node.type === item1) {
+                        subtrees.push(node);
+                        if (!item1Found) {
+                            item1Found = true;
+                        }
+                    } else if (node.type === item2) {
+                        subtrees.push(node);
+                        if (!item2Found) {
+                            item2Found = true;
+                        }
                     }
-                    subtree1 = node;
-                } else if (node.type === item2) {
-                    if (!foundFirst) {
-                        foundFirst = node.type;
-                        score += 2;
-                    }
-                    subtree2 = node;
+                });
+
+                if (!item1Found || !item2Found) {
+                    return [1];
                 }
-            });
 
-            if (!subtree1 || !subtree2) {
-                return 1;
+                for (var i = 0; i < subtrees.length; i++) {
+                    currentItem = subtrees[i].type;
+                    if (currentItem === item1) {
+                        traverse(subtrees[i], function(node) {
+                            if (node.type === item2) {
+                                scores[i] = 8;
+                            }
+                        });
+                        if (scores[i] !== 8) {
+                            scores[i] = 2;
+                        }
+                    } else if (currentItem === item2) {
+                        traverse(subtrees[i], function(node) {
+                            if (node.type === item1) {
+                                scores[i] = 16;
+                            }
+                        });
+                        if (scores[i] !== 16) {
+                            scores[i] = 4;
+                        }
+                    }
+                }
+
+                this.scores = scores;
             }
-
-            traverse(subtree1, function(node) {
-                if (node.type === item2) {
-                    score += 16;
-                }
-            });
-
-            traverse(subtree2, function(node) {
-                if (node.type === item1) {
-                    score += 8;
-                }
-            });
-
-            return score;
+            return this;
         },
-
-        // Provide Synonyms
-        this.mustContain = this.whitelist,
-        this.mustNotContain = this.blacklist,
-
+        this.areAnyXContainingY = function(x, y) {
+            this.compareStructure(x, y);
+            var allScores = this.scores;
+            for (var i = 0; i < allScores.length; i++) {
+                if (allScores[i] === 8) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        this.anXMustContainY = function(x, y){
+            this.compareStructure(x, y);
+            var allScores = this.scores;
+            for (var i = 0; i < allScores.length; i++) {
+                if (allScores[i] === 8) {
+                    return this;
+                }
+            }
+            this.messages.push(config.youNeedMsg + listmap[y] + " inside of a " + listmap[x] + ".");
+            return this;
+        },
+        this.noXShouldContainY = function(x, y){
+            this.compareStructure(x, y);
+            var allScores = this.scores;
+            for (var i = 0; i < allScores.length; i++) {
+                if (allScores[i] === 8) {
+                    this.messages.push(config.youDontNeedMsg + listmap[y] + " inside of a " + listmap[x] + ".");
+                    return this;
+                }
+            }
+            return this;
+        },
         this.alertMessages = function() {
             var allMessages = this.messages;
             for (var i = 0; i < allMessages.length; i++) {
                 alert(allMessages[i]);
             }
-        }
+        },
+
+        // Provide Synonyms
+        this.mustContain = this.whitelist,
+        this.mustNotContain = this.blacklist
     }
 
     function parse(codestring, options) {
         treeData = new Tree();
-        treeData.jsTree = esprima.parse(codestring, options);
+        try {
+            treeData.jsTree = esprima.parse(codestring, options);
+        } catch (e) {
+            treeData.error = true;
+            treeData.messages = [config.errorMsg];
+        }
         return treeData;
     }
 
     return {
-        read: parse,
+        check: parse,
         tree: Tree
     };
 
 })();
-
-
-
-
-
-

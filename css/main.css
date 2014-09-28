@@ -94,6 +94,7 @@ body {
     font-size: 24px;
 }
 .content {
+    color: #444;
     width: 100%;
     padding: 0 8%;
 }
@@ -124,13 +125,36 @@ body {
     min-height: 300px;
     border: 1px solid #f0f0f0;
     background: #f0f0f0;
+    padding: 1em;
 }
-
+.message {
+    margin-bottom: 5px;
+}
 .hidden-examples {
     display: none;
 }
 
 
+/**
+ * target IE7 and IE6
+ */
+*:first-child+html pre {
+    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 2em;
+}
+
+pre {
+    font-size: 0.9em;
+    font-family: "Inconsolata", "Menlo", "Consolas", monospace;
+    word-break: normal;
+    word-wrap: normal;
+    white-space: pre;
+    overflow: visible;
+    overflow-x: auto;
+    padding-bottom: 2em;
+}
 
 
 

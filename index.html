@@ -32,11 +32,13 @@
                 <div class="hidden-examples">
                     <ol>
                         <li class="hidden-example1">function elementSupportsAttribute(element, attribute) {
-    var test = document.createElement(element);
     if (attribute in test) {
-        return true;
+        return test.created ? true : false;
     } else {
         return false;
+    }
+    for (i = 0; i < 3; i++) {
+        alert('delete me');
     }
 };
                         </li>
@@ -49,6 +51,15 @@
                 <form>
                     <textarea class="codebox"></textarea>
                 </form>
+                <div class="api-setting">
+                    <h3>Current API Setting:</h3>
+                    <pre>var code = $('.codebox').val();
+var tree = kv.check(code).mustContain(['VariableDeclaration', 'ForStatement'])
+    .mustNotContain(['IfStatement'])
+    .anXMustContainY('ForStatement', 'VariableDeclaration')
+    .noXShouldContainY('IfStatement', 'ConditionalExpression');
+printMessages(tree.messages);</pre>
+                </div>
             </section>
             <section class="message-content">
                 <h3>Messages</h3>
