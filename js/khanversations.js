@@ -37,9 +37,11 @@ var kv = (function () {
         "ReturnStatement": "Return Statement"
     };
 
-    // Step recursively through the syntax tree object, applying our function.
-    // Borrowed from this esprima.js example:
-    // http://ariya.ofilabs.com/2012/06/detecting-boolean-traps-with-esprima.html
+    /**
+     * Step recursively through the syntax tree object, applying our function.
+     * I borrowed from this esprima.js example:
+     * http://ariya.ofilabs.com/2012/06/detecting-boolean-traps-with-esprima.html
+     */
     function traverse(object, visitor) {
         var key, child;
 
@@ -55,10 +57,10 @@ var kv = (function () {
     }
 
     function Tree() {
-        this.jsTree  = {},
-        this.messages = [],
-        this.scores = [],
-        this.error = false,
+        this.jsTree  = {};
+        this.messages = [];
+        this.scores = [];
+        this.error = false;
         this.blacklist = function(listitems) {
             var self = this;
 
@@ -72,7 +74,7 @@ var kv = (function () {
                 });
             }
             return this;
-        },
+        };
         this.whitelist = function(listitems) {
             var nodeCounts = {},
                 self = this;
@@ -95,11 +97,8 @@ var kv = (function () {
                 }
             }
             return this;
-        },
+        };
         this.compareStructure = function(item1, item2) {
-            // This currently only supports parsed javascript where there are
-            // one or zero instances of each item you are comparing.
-            //
             // Bitmask Scoring Rubric
             //
             // 000001  1   Either item 1 or item 2 is missing.
@@ -160,7 +159,7 @@ var kv = (function () {
                 this.scores = scores;
             }
             return this;
-        },
+        };
         this.areAnyXContainingY = function(x, y) {
 
             this.compareStructure(x, y);
@@ -171,7 +170,7 @@ var kv = (function () {
                 }
             }
             return false;
-        },
+        };
         this.anXMustContainY = function(x, y){
             this.compareStructure(x, y);
             var allScores = this.scores;
@@ -182,7 +181,7 @@ var kv = (function () {
             }
             this.messages.push(config.youNeedMsg + listmap[y] + " inside of a " + listmap[x] + ".");
             return this;
-        },
+        };
         this.noXShouldContainY = function(x, y){
             this.compareStructure(x, y);
             var allScores = this.scores;
@@ -193,17 +192,17 @@ var kv = (function () {
                 }
             }
             return this;
-        },
+        };
         this.alertMessages = function() {
             var allMessages = this.messages;
             for (var i = 0; i < allMessages.length; i++) {
                 alert(allMessages[i]);
             }
-        },
+        };
 
         // Provide Synonyms
-        this.mustContain = this.whitelist,
-        this.mustNotContain = this.blacklist
+        this.mustContain = this.whitelist;
+        this.mustNotContain = this.blacklist;
     }
 
     function parse(codestring, options) {
