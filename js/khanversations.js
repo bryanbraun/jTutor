@@ -44,7 +44,7 @@ var kv = (function () {
     }
 
     /**
-     * A list of all testable functionality, with human readable versions.
+     * A list of supported testable functionality, with human readable text.
      */
     var listmap = {
         "ConditionalExpression": "Conditional Expression", // ternary
@@ -57,38 +57,101 @@ var kv = (function () {
     var testArray = ['ConditionalExpression', 'IfStatement', 'ForStatement'];
 
     function Tree() {
-        // Properties.
         this.jsTree  = {},
         this.messages = [],
         this.blacklist = function(listitems) {
+            var self = this;
             traverse(this.jsTree, function(node) {
                 for (var i = 0; i < listitems.length; i++) {
                     if (node.type === listitems[i]) {
-                        this.messages.push("Oops, you don't need to use a " + listmap[listitems[i]]);
+                        self.messages.push("Oops, you don't need to use a " + listmap[listitems[i]]);
                     }
                 }
             });
             return this;
         },
         this.whitelist = function(listitems) {
-            var nodeCounts = {};
+            var nodeCounts = {},
+                self = this;
             for (var i = 0; i < listitems.length; i++) {
                 nodeCounts[listitems[i]] = 0;
             }
-            result = traverse(this.jsTree, function(node) {
-                for (var i = 0; i < listitems.length; i++) {
+            traverse(this.jsTree, function(node) {
+                for (i = 0; i < listitems.length; i++) {
                     if (node.type === listitems[i]) {
                         nodeCounts[listitems[i]]++;
                     }
                 }
             });
-            for (var i = 0; i < listitems.length; i++) {
+            for (i = 0; i < listitems.length; i++) {
                 if (nodeCounts[listitems[i]] === 0) {
-                    this.messages.push("Oops, you need to use a " + listmap[listitems[i]]);
+                    self.messages.push("Oops, you need to use a " + listmap[listitems[i]]);
                 }
             }
             return this;
-        };
+        },
+        this.compareStructure = function(item1, item2) {
+            // This currently only supports parsed javascript where there are
+            // one or zero instances of each item you are comparing.
+            //
+            // Bitmask Scoring Rubric
+            //
+            // 000001  1   Either item 1 or item 2 is missing.
+            // 000010  2   Item 2 precedes Item 1.
+            // 000100  4   Item 1 precedes Item 2.
+            // 001000  8   Item 2 contains Item 1.
+            // 010000  16  Item 1 contains Item 2.
+
+            var score = 0,
+                subtree1 = null,
+                subtree2 = null,
+                foundFirst = '';
+
+            traverse(this.jsTree, function(node) {
+                if (node.type === item1) {
+                    if (!foundFirst) {
+                        foundFirst = node.type;
+                        score += 4;
+                    }
+                    subtree1 = node;
+                } else if (node.type === item2) {
+                    if (!foundFirst) {
+                        foundFirst = node.type;
+                        score += 2;
+                    }
+                    subtree2 = node;
+                }
+            });
+
+            if (!subtree1 || !subtree2) {
+                return 1;
+            }
+
+            traverse(subtree1, function(node) {
+                if (node.type === item2) {
+                    score += 16;
+                }
+            });
+
+            traverse(subtree2, function(node) {
+                if (node.type === item1) {
+                    score += 8;
+                }
+            });
+
+            return score;
+        },
+
+        // Provide Synonyms
+        this.mustContain = this.whitelist,
+        this.mustNotContain = this.blacklist,
+
+        this.alertMessages = function() {
+            var allMessages = this.messages;
+            for (var i = 0; i < allMessages.length; i++) {
+                alert(allMessages[i]);
+            }
+        }
     }
 
     function parse(codestring, options) {
@@ -97,12 +160,9 @@ var kv = (function () {
         return treeData;
     }
 
-    // Reveal public pointers to
-    // private functions and properties
     return {
         read: parse,
         tree: Tree
-        // blacklist: blacklist
     };
 
 })();
