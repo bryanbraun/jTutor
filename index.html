@@ -20,7 +20,7 @@
     </head>
     <body>
         <header class="header">
-            <h1>Khanversations</h1>
+            <h1>jTutor</h1>
             <h2>An API for providing real-time, conversational feedback to javascript developers in the browser.</h2>
         </header>
         <main class="content">
@@ -59,7 +59,7 @@
                 <div class="api-setting">
                     <h3>Current API Setting:</h3>
                     <pre>var code = $('.codebox').val();
-var tree = kv.check(code)
+var tree = jTutor.check(code)
     .mustContain(['VariableDeclaration', 'ForStatement'])
     .mustNotContain(['IfStatement'])
     .anXMustContainY('ForStatement', 'VariableDeclaration')
@@ -77,7 +77,7 @@ printMessages(tree.messages);</pre>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.js"><\/script>')</script>
         <script src="js/vendor/esprima.js"></script>
         <script src="js/plugins.js"></script>
-        <script src="js/khanversations.js"></script>
+        <script src="js/jTutor.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>

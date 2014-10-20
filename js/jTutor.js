@@ -1,4 +1,4 @@
-var kv = (function () {
+var jTutor = (function () {
     /**
      * Config data.
      *
@@ -11,31 +11,19 @@ var kv = (function () {
     };
 
     /**
-     * A list of common testable functionality, with human readable text (see
-     * Esprima API for all possible options).
+     * A list of testable language constructs from esprima. Examples include:
      *
-     * @todo: Pull the list directly from Esprima, which ensures it's always
-     *        current.
+     * - ForStatement
+     * - IfStatement
+     * - SwitchCase
+     * - AssignmentExpression
+     * - VariableDeclaration
+     * - ContinueStatement
+     * - ReturnStatement
+     *
+     * (see Esprima API for all possible options).
      */
-    var listmap = {
-        "ConditionalExpression": "Conditional Expression",
-        "IfStatement": "If Statement",
-        "ForStatement": "For Statement",
-        "VariableDeclaration": "Variable Declaration",
-        "WhileStatement": "While Statement",
-        "ContinueStatement": "Continue Statement",
-        "SwitchStatement": "Switch Statement",
-        "SwitchCase": "Switch Case",
-        "BreakStatement": "Break Statement",
-        "DoWhileStatement": "Do-While Statement",
-        "UpdateExpression": "Update Expression", // Increment or decrement
-        "TryStatement": "Try Statment",
-        "CatchClause": "Catch Clause",
-        "ThrowStatement": "Throw Statement",
-        "NewExpression": "New Expression", // For instantiating objects
-        "FunctionDeclaration": "Function Declaration",
-        "ReturnStatement": "Return Statement"
-    };
+    var listmap = esprima.Syntax;
 
     /**
      * Step recursively through the syntax tree object, applying our function.
